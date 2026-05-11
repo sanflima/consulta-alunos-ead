@@ -82,7 +82,6 @@ tbody tr:hover td{background:#f0faf4}
         </div>
         <div id="excelStatus" class="csv-status" aria-live="polite"></div>
         <button class="btn-download" id="btnBaixarHtml" type="button">Baixar HTML atualizado</button>
-        <button class="btn-download" id="btnBaixarHtml" type="button">Baixar HTML atualizado</button>
       </div>
     </div>
     <div class="box">
@@ -144,7 +143,6 @@ const el={
   excelFileInput:document.getElementById('excelFileInput'),
   uploadStatus:document.getElementById('excelStatus'),
   btnBaixarHtml:document.getElementById('btnBaixarHtml'),
-  btnBaixarHtml:document.getElementById('btnBaixarHtml'),
   tbody:document.getElementById('tbody'),
   tabela:document.getElementById('tabela'),
   scrollTop:document.getElementById('tableScrollTop'),
@@ -159,8 +157,6 @@ const el={
   s4:document.getElementById('s4')
 };
 let sincronizandoScroll=false;
-let htmlFonte=null;
-fetch(location.href).then(r=>r.text()).then(t=>{htmlFonte=t;}).catch(()=>{});
 let htmlFonte=null;
 fetch(location.href).then(r=>r.text()).then(t=>{htmlFonte=t;}).catch(()=>{});
 
@@ -439,8 +435,7 @@ el.excelFileInput.onchange=async()=>{
     atualizarCursos();
     filtrar();
     setUploadStatus(`Planilha atualizada: ${dados.length} registros (${arquivos.length} arquivo(s)).`,'ok');
-    if(el.btnBaixarHtml)el.btnBaixarHtml.style.display='';
-    if(el.btnBaixarHtml)el.btnBaixarHtml.style.display='';
+    el.btnBaixarHtml.style.display='';
   }catch(e){
     console.error(e);
     setUploadStatus('Erro ao processar o Excel. Verifique o formato da planilha.','err');
@@ -450,7 +445,7 @@ el.excelFileInput.onchange=async()=>{
 };
 
 el.btnBaixarHtml.onclick=()=>{
-  if(!htmlFonte){alert('Carregue a p\u00e1gina via servidor (GitHub Pages ou http-server). Baixe diretamente pelo GitHub se n\u00e3o funcionar.');return;}
+  if(!htmlFonte){alert('Abra a p\u00e1gina pelo GitHub Pages para usar esta fun\u00e7\u00e3o.');return;}
   const novoHtml=htmlFonte
     .replace(/let dados=\[[\s\S]*?\];/,'let dados='+JSON.stringify(dados)+';')
     .replace(/<div class="big-number" id="totalReg">\d+<\/div>/,'<div class="big-number" id="totalReg">'+dados.length+'<\/div>');
