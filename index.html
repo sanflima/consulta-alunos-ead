@@ -435,7 +435,7 @@ el.excelFileInput.onchange=async()=>{
     atualizarCursos();
     filtrar();
     setUploadStatus(`Planilha atualizada: ${dados.length} registros (${arquivos.length} arquivo(s)).`,'ok');
-    el.btnBaixarHtml.style.display='';
+    el.btnBaixarHtml.style.display='block';
   }catch(e){
     console.error(e);
     setUploadStatus('Erro ao processar o Excel. Verifique o formato da planilha.','err');
