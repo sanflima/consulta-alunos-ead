@@ -53,6 +53,8 @@ tbody tr:hover td{background:#f0faf4}
 .qtd{text-align:center;font-weight:700;color:#0b5d2a;width:36px}
 #tabela th:nth-child(4),#tabela td:nth-child(4){min-width:130px;white-space:nowrap}
 #tabela th:nth-child(6),#tabela td:nth-child(6){min-width:150px;white-space:nowrap}
+.btn-download{background:#2563eb;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%;margin-top:6px;display:none}
+.btn-download:hover{background:#1d4ed8}
 </style>
 </head>
 <body>
@@ -79,6 +81,8 @@ tbody tr:hover td{background:#f0faf4}
           <input id="excelFileInput" type="file" accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple hidden>
         </div>
         <div id="excelStatus" class="csv-status" aria-live="polite"></div>
+        <button class="btn-download" id="btnBaixarHtml" type="button">Baixar HTML atualizado</button>
+        <button class="btn-download" id="btnBaixarHtml" type="button">Baixar HTML atualizado</button>
       </div>
     </div>
     <div class="box">
@@ -139,6 +143,8 @@ const el={
   uploadArquivo:document.getElementById('btnUploadExcel'),
   excelFileInput:document.getElementById('excelFileInput'),
   uploadStatus:document.getElementById('excelStatus'),
+  btnBaixarHtml:document.getElementById('btnBaixarHtml'),
+  btnBaixarHtml:document.getElementById('btnBaixarHtml'),
   tbody:document.getElementById('tbody'),
   tabela:document.getElementById('tabela'),
   scrollTop:document.getElementById('tableScrollTop'),
@@ -153,6 +159,10 @@ const el={
   s4:document.getElementById('s4')
 };
 let sincronizandoScroll=false;
+let htmlFonte=null;
+fetch(location.href).then(r=>r.text()).then(t=>{htmlFonte=t;}).catch(()=>{});
+let htmlFonte=null;
+fetch(location.href).then(r=>r.text()).then(t=>{htmlFonte=t;}).catch(()=>{});
 
 function texto(v){return (v??'').toString().trim();}
 function exib(v){const t=texto(v);return t||'-';}
@@ -429,12 +439,25 @@ el.excelFileInput.onchange=async()=>{
     atualizarCursos();
     filtrar();
     setUploadStatus(`Planilha atualizada: ${dados.length} registros (${arquivos.length} arquivo(s)).`,'ok');
+    if(el.btnBaixarHtml)el.btnBaixarHtml.style.display='';
+    if(el.btnBaixarHtml)el.btnBaixarHtml.style.display='';
   }catch(e){
     console.error(e);
     setUploadStatus('Erro ao processar o Excel. Verifique o formato da planilha.','err');
   }finally{
     el.excelFileInput.value='';
   }
+};
+
+el.btnBaixarHtml.onclick=()=>{
+  if(!htmlFonte){alert('Carregue a p\u00e1gina via servidor (GitHub Pages ou http-server). Baixe diretamente pelo GitHub se n\u00e3o funcionar.');return;}
+  const novoHtml=htmlFonte
+    .replace(/let dados=\[[\s\S]*?\];/,'let dados='+JSON.stringify(dados)+';')
+    .replace(/<div class="big-number" id="totalReg">\d+<\/div>/,'<div class="big-number" id="totalReg">'+dados.length+'<\/div>');
+  const blob=new Blob([novoHtml],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='index.html';a.click();
+  URL.revokeObjectURL(url);
 };
 
 atualizarPolos();
