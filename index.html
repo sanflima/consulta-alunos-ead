@@ -53,8 +53,8 @@ tbody tr:hover td{background:#f0faf4}
 .qtd{text-align:center;font-weight:700;color:#0b5d2a;width:36px}
 #tabela th:nth-child(4),#tabela td:nth-child(4){min-width:130px;white-space:nowrap}
 #tabela th:nth-child(6),#tabela td:nth-child(6){min-width:150px;white-space:nowrap}
-.btn-download{background:#2563eb;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%;margin-top:6px;display:none}
-.btn-download:hover{background:#1d4ed8}
+.btn-baixar-html{background:#dbeafe;color:#1d4ed8;border:1.5px solid #93c5fd;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;margin-left:6px}
+.btn-baixar-html:hover{background:#bfdbfe;border-color:#60a5fa}
 </style>
 </head>
 <body>
@@ -81,7 +81,6 @@ tbody tr:hover td{background:#f0faf4}
           <input id="excelFileInput" type="file" accept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple hidden>
         </div>
         <div id="excelStatus" class="csv-status" aria-live="polite"></div>
-        <button class="btn-download" id="btnBaixarHtml" type="button">Baixar HTML atualizado</button>
       </div>
     </div>
     <div class="box">
@@ -104,7 +103,7 @@ tbody tr:hover td{background:#f0faf4}
       <div class="toolbar-left" id="contador">0 resultados</div>
       <div>
         <button class="btn-out" id="btnCsv">Exportar CSV</button>
-        <button class="btn-out" id="btnExcel">Exportar Excel</button>
+        <button class="btn-baixar-html" id="btnExcel">Baixar HTML</button>
       </div>
     </div>
     <div class="table-wrap">
@@ -142,7 +141,6 @@ const el={
   uploadArquivo:document.getElementById('btnUploadExcel'),
   excelFileInput:document.getElementById('excelFileInput'),
   uploadStatus:document.getElementById('excelStatus'),
-  btnBaixarHtml:document.getElementById('btnBaixarHtml'),
   tbody:document.getElementById('tbody'),
   tabela:document.getElementById('tabela'),
   scrollTop:document.getElementById('tableScrollTop'),
@@ -308,10 +306,14 @@ document.getElementById('btnCsv').onclick=()=>{
 };
 
 document.getElementById('btnExcel').onclick=()=>{
-  const a=document.createElement('a');
-  a.href='data:application/vnd.ms-excel,'+encodeURIComponent(document.getElementById('tabela').outerHTML);
-  a.download='alunos.xls';
-  a.click();
+  if(!htmlFonte){alert('Abra a p\u00e1gina pelo GitHub Pages para usar esta fun\u00e7\u00e3o.');return;}
+  const novoHtml=htmlFonte
+    .replace(/let dados=\[[\s\S]*?\];/,'let dados='+JSON.stringify(dados)+';')
+    .replace(/<div class="big-number" id="totalReg">\d+<\/div>/,'<div class="big-number" id="totalReg">'+dados.length+'<\/div>');
+  const blob=new Blob([novoHtml],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='index.html';a.click();
+  URL.revokeObjectURL(url);
 };
 
 function detectarSeparadorCsv(textoCsv){
@@ -434,8 +436,7 @@ el.excelFileInput.onchange=async()=>{
     atualizarPolos();
     atualizarCursos();
     filtrar();
-    setUploadStatus(`Planilha atualizada: ${dados.length} registros (${arquivos.length} arquivo(s)).`,'ok');
-    el.btnBaixarHtml.style.display='block';
+    setUploadStatus(`Planilha atualizada: ${dados.length} registros (${arquivos.length} arquivo(s)).`,'ok');
   }catch(e){
     console.error(e);
     setUploadStatus('Erro ao processar o Excel. Verifique o formato da planilha.','err');
@@ -443,17 +444,7 @@ el.excelFileInput.onchange=async()=>{
     el.excelFileInput.value='';
   }
 };
-
-el.btnBaixarHtml.onclick=()=>{
-  if(!htmlFonte){alert('Abra a p\u00e1gina pelo GitHub Pages para usar esta fun\u00e7\u00e3o.');return;}
-  const novoHtml=htmlFonte
-    .replace(/let dados=\[[\s\S]*?\];/,'let dados='+JSON.stringify(dados)+';')
-    .replace(/<div class="big-number" id="totalReg">\d+<\/div>/,'<div class="big-number" id="totalReg">'+dados.length+'<\/div>');
-  const blob=new Blob([novoHtml],{type:'text/html;charset=utf-8'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download='index.html';a.click();
-  URL.revokeObjectURL(url);
-};
+
 
 atualizarPolos();
 atualizarCursos();
